@@ -1,0 +1,68 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+
+export default function ChemicalBondModel() {
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+
+// Membuat atom (bola)
+const atomGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+const atomMaterial1 = new THREE.MeshPhongMaterial({ color: 0xff0000 }); // Atom 1
+const atomMaterial2 = new THREE.MeshPhongMaterial({ color: 0x0000ff }); // Atom 2
+const atom1 = new THREE.Mesh(atomGeometry, atomMaterial1);
+const atom2 = new THREE.Mesh(atomGeometry, atomMaterial2);
+atom2.position.x = 2; // jarak antar atom
+
+
+// Membuat ikatan (silinder)
+const bondGeometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 32);
+const bondMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
+const bond = new THREE.Mesh(bondGeometry, bondMaterial);
+bond.rotation.z = Math.PI / 2;
+bond.position.x = 1;
+
+
+scene.add(atom1, atom2, bond);
+
+
+// Tambahkan pencahayaan
+const light = new THREE.PointLight(0xffffff, 1);
+light.position.set(5, 5, 5);
+scene.add(light);
+
+
+const ambientLight = new THREE.AmbientLight(0x404040);
+scene.add(ambientLight);
+
+
+camera.position.z = 5;
+
+
+// Animasi
+function animate() {
+requestAnimationFrame(animate);
+controls.update();
+renderer.render(scene, camera);
+}
+animate();
+
+
+// Resize handler
+window.addEventListener('resize', () => {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
+});
+}
